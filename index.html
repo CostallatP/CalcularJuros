@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+<html>
+  
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+<head>
+    <title>guia calculadora</title>
+    <style>
+        .output {
+            font-weight: bold;
+        }
+
+        #payment {
+            text-decoration: underline;
+        }
+
+        #graph {
+            border: solid black 1px;
+        }
+
+        th,
+        td {
+            vertical-align: top;
+        }
+    </style>
+</head>
+
+<body>
+   <p class="p-3 mb-2 bg-warning text-dark" > código do livro JavaScript guia definitivo 6 edição página 14 capitulo 1, além que personalizei com bootstrap. </p>
+
+    <table class= "table table-dark table-striped">
+        <tr>
+            <th> insira os dados do empréstimo:</th>
+            <td></td>
+            <th>saldo do empréstimo, capital com juros e pagamentos de juros</th>
+        </tr>
+        <tr>
+            <td> montante do empréstimo (R$):</td>
+            <td><input id="amount" onchange="calculate();"></td>
+            <td rowspan="8"><canvas id="graph" width="400" height="250"></canvas></td>
+        </tr>
+        <tr>
+            <td>Juro anual(%):</td>
+            <td><input id="apr" onchange="calculate();"></td>
+        </tr>
+        <tr>
+            <td>Período de reembolso(anos):</td>
+            <td><input id="years" onchange="calculate();"></td>
+        <tr>
+            <td>Código postal (encontrar credores):</td>
+            <td><input id="zipcode" onchange="calculate();"></td>
+        <tr>
+            <th>Pagamentos aproximados:</th>
+            <td><button type="button" class="btn btn-outline-primary" onclick="calculate();">Calcular</button></td>
+        </tr>
+        <tr>
+            <td>Pagamento mensal:</td>
+            <td>R$<span class="output" id="payment"></span></td>
+        </tr>
+        <tr>
+            <td>Pagamento total:</td>
+            <td>R$<span class="output" id="total"></span></td>
+        </tr>
+        <tr>
+            <td> Lucro total:</td>
+            <td>R$<span class="output" id="totalinterest"></span></td>
+        </tr>
+        <tr>
+            <th>Patrocinadores</th>
+            <td colspan="2">Candidate-se ao seu empréstimo com um desses credores:
+                <div id="lenders"></div>
+            </td>
+        </tr>
+        <script>
+            "use strict";
+            function calculate() {
+                var amount = document.getElementById("amount");
+                var apr = document.getElementById("apr");
+                var years = document.getElementById("years");
+                var zipcode = document.getElementById("zipcode");
+                var payment = document.getElementById("payment");
+                var total = document.getElementById("total");
+                var totalinterest = document.getElementById("totalinterest");
+
+                var principal = parseFloat(amount.value);
+                var interest = parseFloat(apr.value) / 100 / 12;
+                var payments = parseFloat(years.value) * 12;
+
+                var x = Math.pow(1 + interest, payments);
+                var monthly = (principal * x * interest) / (x - 1);
+
+                if (isFinite(monthly)) {
+                    payment.innerHTML = monthly.toFixed(2);
+                    total.innerHTML = (monthly * payments).toFixed(2);
+                    totalinterest.innerHTML = ((monthly * payments) - principal).toFixed(2);
+
+                    // importante para registrar
+                    save(amount.value, apr.value, years.value, zipcode.value);
+
+                    try { getLenders(amount.value, apr.value, years.value, zipcode.value); }
+                    catch (e) { /* ignorar erros */ }
+                     chart(principal, interest, monthly, payments);
+                }
+                else {
+                    payment.innerHTML = "";
+                    total.innerHTML = "";
+                    totalinterest.innerHTML = "";
+                    chart();
+                }
+            }
+            function save(amount, apr, years, zipcode) {
+                if (window.localStorage) {
+                    localStorage.loan_amount = amount;
+                    localStorage.loan_apr = apr;
+                    localStorage.loan_years = years;
+                    localStorage.loan_zipcode = zipcode;
+                }
+            }
+
+
+
+
+
+
+        </script>
+      
+
+    </table>
+</body>
+
+</html>
